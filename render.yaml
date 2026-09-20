@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: manmeet-authoritative-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # Set in Render Dashboard: libsql://<db-name>.turso.io
+      - key: DATABASE_AUTH_TOKEN
+        sync: false # Set in Render Dashboard: <turso-auth-token>

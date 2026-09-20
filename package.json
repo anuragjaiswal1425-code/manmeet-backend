@@ -1,0 +1,22 @@
+{
+  "name": "manmeet-cloud-backend",
+  "version": "1.0.0",
+  "description": "Authoritative Remote Cloud Backend Service for MANMEET Matrimonial & Dating App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test_complete_suite.js"
+  },
+  "keywords": [
+    "manmeet",
+    "matrimonial",
+    "cloud-backend",
+    "sqlite",
+    "rest-api"
+  ],
+  "author": "MANMEET Team",
+  "license": "ISC",
+  "dependencies": {
+    "@libsql/client": "^0.18.0"
+  }
+}
