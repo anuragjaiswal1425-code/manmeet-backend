@@ -428,6 +428,33 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
+    // 3b. Candidates (gender/interestedIn reciprocal match)
+    if (pathname === '/api/candidates' && method === 'GET') {
+      const norm = (s) => {
+        const v = (s || '').toLowerCase();
+        if (/every|all|both|any/.test(v)) return 'A';
+        if (v.startsWith('m')) return 'M';
+        if (v.startsWith('f') || v.startsWith('w')) return 'F';
+        return 'A';
+      };
+      const me = await db.get('SELECT gender, interestedIn FROM profiles WHERE userId = ?', currentUserId);
+      const rows = await db.all(`
+        SELECT p.* FROM profiles p
+        WHERE p.userId != ?
+          AND p.userId NOT IN (SELECT targetCandidateId FROM likes WHERE callerUserId = ?)
+          AND p.userId NOT IN (SELECT targetCandidateId FROM passes WHERE callerUserId = ?)
+        ORDER BY p.updatedAt DESC
+        LIMIT 100
+      `, currentUserId, currentUserId, currentUserId);
+      const myG = norm(me && me.gender);
+      const myI = norm(me && me.interestedIn);
+      const result = rows.filter(r => {
+        const g = norm(r.gender), i = norm(r.interestedIn);
+        return (myI === 'A' || myI === g) && (i === 'A' || i === myG);
+      }).map(formatProfileResponse);
+      return sendJson(res, 200, { success: true, data: result });
+    }
+
     // 4. Discovery Feed: Discover Candidates
     if (pathname === '/api/discovery/feed' && method === 'GET') {
       const candidates = await db.all(`
